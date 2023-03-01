@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::io::{BufReader, BufWriter, Cursor};
+use std::io::{BufWriter, Cursor};
 use std::net::SocketAddr;
 
 use axum::body::Bytes;
@@ -66,10 +66,9 @@ async fn handle_image_processing(params: Query<Params>) -> impl IntoResponse {
         Err(e) => return Err(e.to_string()),
     };
 
-    let img = image::io::Reader::new(BufReader::new(Cursor::new(image_data)))
-        .with_guessed_format()
-        .map_err(|e| e.to_string())?
-        .decode()
+    let image_format = ImageFormat::from_mime_type(&mime_type).unwrap();
+
+    let img = image::load_from_memory_with_format(&image_data, image_format)
         .map_err(|e| e.to_string())?;
 
     let new_image = match params.mode {
@@ -84,10 +83,7 @@ async fn handle_image_processing(params: Query<Params>) -> impl IntoResponse {
 
     let mut buffer = BufWriter::new(Cursor::new(Vec::new()));
     new_image
-        .write_to(
-            &mut buffer,
-            ImageFormat::from_mime_type(&mime_type).unwrap(),
-        )
+        .write_to(&mut buffer, image_format)
         .map_err(|e| e.to_string())?;
 
     Ok((
