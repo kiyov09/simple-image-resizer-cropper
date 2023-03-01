@@ -1,4 +1,4 @@
-Simple image resizer/cropper API.
+# Simple image resizer/cropper API.
 
 This is a Rust 🦀 port of the following article on the [Deno Blog](https://deno.com/blog):
 
