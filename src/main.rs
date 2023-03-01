@@ -10,7 +10,6 @@ use axum::routing::get;
 use axum::Router;
 use image::ImageFormat;
 use serde::Deserialize;
-use tokio::time::Instant;
 
 #[derive(Deserialize, Debug)]
 enum Mode {
